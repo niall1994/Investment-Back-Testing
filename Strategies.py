@@ -4,10 +4,23 @@ import streamlit as st
 import yfinance as yf
 import math
 
-@st.cache(allow_output_mutation=True)
+#@st.cache(allow_output_mutation=True)
 def import_price_data(ticker, start, end, trade_interval):
     ticker_data = yf.Ticker(ticker)
     return ticker_data.history(period = trade_interval, start = start, end = end)
+
+def control_function(strategy, initial_cash, ticker, start, end, trade_interval):
+
+    price_data = import_price_data(ticker, start, end, trade_interval)
+
+    if strategy == 'buy_and_hold':
+        return buy_and_hold(initial_cash, price_data)
+    if strategy == 'simple_momentum':
+        return simple_momentum(price_data)
+    if strategy == 'buy_and_hold_sp':
+        return buy_and_hold_sp(start, end, trade_interval, initial_cash)
+    else:
+        raise Exception('Must Select an implemented strategy')
 
 def buy_and_hold(initial_cash, price_data_df):
     # Double check that all the required columns exist
@@ -47,3 +60,9 @@ def simple_momentum(price_data_df):
     price_data_df.loc[price_data_df['Previous Period Price Decrease'] >= 0, 'Transaction'] = -1
 
     return price_data_df
+
+def buy_and_hold_sp(start, end, trade_interval, initial_cash):
+    price_data = import_price_data('^GSPC', start, end, trade_interval)
+    price_data = buy_and_hold(initial_cash, price_data)
+
+    return price_data

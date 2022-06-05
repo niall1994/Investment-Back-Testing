@@ -26,7 +26,7 @@ def create_standard_account_values(transaction_df, initial_cash):
     transaction_df['Number of Shares Owned'] = transaction_df['Transaction'].cumsum()
 
     # Calculate amount of Cash in portfolio, assume close price is what we get
-    transaction_df.iloc[0, cash_index] = initial_cash
+    transaction_df.iloc[0, cash_index] = initial_cash - transaction_df.iloc[0, transaction_index] * transaction_df.iloc[0,close_index]
     transaction_df.iloc[1:, cash_index] = -1 * transaction_df.iloc[1:,transaction_index] * transaction_df.iloc[1:,close_index]
     transaction_df['Cash'] = transaction_df['Cash'].cumsum()
 
