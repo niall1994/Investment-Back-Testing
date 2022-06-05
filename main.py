@@ -25,7 +25,7 @@ with col1:
 with col2:
     start, end = st.slider(
         'Date Range for the Analysis',
-        value = (datetime(2015,1,1),datetime(2022,1,1))
+        value = (datetime(2015,1,1),datetime.today())
                  ,format = 'MM/DD/YY'
     )
 
