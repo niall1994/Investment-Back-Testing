@@ -1,0 +1,7 @@
+pandas
+math
+yfinance
+matplotlib
+streamlit
+Yahoo-ticker-downloader
+datetime
