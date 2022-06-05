@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 from Projection_Functions import create_standard_account_values
-from Strategies import buy_and_hold, import_price_data, simple_momentum
+from Strategies import control_function
 from graphing_functions import value_time_series, cash_time_series
 from datetime import datetime
 
@@ -18,6 +18,7 @@ st.title('Trading strategy Technical Analysis')
 
 # Create some inputs for the user
 col1, col2, col3, col4 = st.columns(4)
+col5, col6 = st.columns(2)
 
 with col1:
     ticker = st.text_input('What Ticker would you like to use?', value = 'MSFT')
@@ -36,32 +37,38 @@ with col3:
 with  col4:
     cash = st.slider('Beginning Cash Value', 0, 1000000, 10000, format = "%f$")
 
+with col5:
+    strat1 = st.selectbox('Which Strategy are you simulating? (Strategy 1)',
+                          ['buy_and_hold','simple_momentum'])
+with col6:
+    strat2 = st.selectbox('Which Strategy are you simulating? (Strategy 2)',
+                          ['buy_and_hold','simple_momentum'])
+
 #Declare Variables
 ticker_symbol = ticker
 start_date = start
 end_date = end
 intervals = interval
 starting_cash = cash
+strategy1 = strat1
+strategy2 = strat2
 
-#get ticker data
-ticker_data_df = import_price_data(ticker_symbol, start_date, end_date, intervals)
+# Create the main strategy
+strategy1_df = control_function(strategy1, starting_cash, ticker_symbol, start_date, end_date, intervals)
 
-# Create the trading dataframe
-trading_df = ticker_data_df[['Open','Close']]
+# Calculate Account Values
+strategy1_df = create_standard_account_values(strategy1_df, starting_cash)
 
-#Simple Momentum Strategy, sell when close < open, and vice versa. No short Selling or debt allowed
-trading_df = simple_momentum(trading_df)
+# Same for second strategy
+strategy2_df = control_function(strategy2, starting_cash, ticker_symbol, start_date, end_date, intervals)
+strategy2_df = create_standard_account_values(strategy2_df, starting_cash)
 
-# Projected Strategy
-trading_df = create_standard_account_values(trading_df, starting_cash)
-
-# What would happen if we just bought and hold this stock?
-buy_and_hold_df = buy_and_hold(starting_cash,ticker_data_df)
-buy_and_hold_df = create_standard_account_values(buy_and_hold_df, starting_cash)
+# Buy the SP 500
+control_sp_df = control_function('buy_and_hold_sp', starting_cash, ticker_symbol, start_date, end_date, intervals)
+control_sp_df = create_standard_account_values(control_sp_df, starting_cash)
 
 # Graph Performance
-st.pyplot(value_time_series(trading_df, 'Simple Momentum', buy_and_hold_df, 'Buy and Hold'))
-st.pyplot(cash_time_series(trading_df, 'Simple Momentum', buy_and_hold_df, 'Buy and Hold'))
+st.pyplot(value_time_series(strategy1_df, strat1, strategy2_df, strat2, control_sp_df, 'Buy and Hold SP'))
+st.pyplot(cash_time_series(strategy1_df, strat1, strategy2_df, strat2, control_sp_df, 'Buy and Hold SP'))
 
-# Load in the Projection DF
-st.write(trading_df[['Close','Transaction','Cash','Share Value']])
+st.write(strategy1_df)
