@@ -68,5 +68,5 @@ control_sp_df = control_function('buy_and_hold_sp', starting_cash, ticker_symbol
 control_sp_df = create_standard_account_values(control_sp_df, starting_cash)
 
 # Graph Performance
-st.pyplot(value_time_series(strategy1_df, strat1, strategy2_df, strat2, control_sp_df, 'Buy and Hold SP'))
-st.pyplot(cash_time_series(strategy1_df, strat1, strategy2_df, strat2, control_sp_df, 'Buy and Hold SP'))
+st.pyplot(value_time_series(strategy1_df, strat1, strategy2_df, strat2, control_sp_df, 'Buy and Hold S&P 500'))
+st.pyplot(cash_time_series(strategy1_df, strat1, strategy2_df, strat2, control_sp_df, 'Buy and Hold S&P 500'))
